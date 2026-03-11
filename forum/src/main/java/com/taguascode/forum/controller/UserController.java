@@ -27,6 +27,7 @@ import com.taguascode.forum.model.User;
 import com.taguascode.forum.repository.UserRepository;
 
 import jakarta.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/users")
@@ -101,6 +102,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
         return userRepository.findById(id)
+                .map(user -> ResponseEntity.ok(toDTO(user)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
                 .map(user -> ResponseEntity.ok(toDTO(user)))
                 .orElse(ResponseEntity.notFound().build());
     }

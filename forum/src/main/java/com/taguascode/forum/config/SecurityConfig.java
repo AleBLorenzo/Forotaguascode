@@ -81,8 +81,9 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:3000",
+                "http://127.0.0.1:5173",
                 "https://foro.taguascode.cloud",
-                "https://foro.taguascode.cloud"));
+                "https://api.foro.taguascode.cloud"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

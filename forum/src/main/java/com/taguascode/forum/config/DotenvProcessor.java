@@ -7,23 +7,16 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.stereotype.Component;
 
-@Component
-public class DotenvLoader implements ApplicationRunner {
-
-    private final ConfigurableEnvironment environment;
-
-    public DotenvLoader(ConfigurableEnvironment environment) {
-        this.environment = environment;
-    }
+public class DotenvProcessor implements EnvironmentPostProcessor {
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Path envPath = Paths.get(".env");
         
         if (!Files.exists(envPath)) {
