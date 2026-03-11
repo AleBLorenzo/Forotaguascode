@@ -25,10 +25,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         
         String path = request.getRequestURI();
+        String method = request.getMethod();
         
-        if (!path.startsWith("/api/users/login") && 
-            !path.startsWith("/api/users/register") &&
-            !path.startsWith("/api/users/refresh")) {
+        // Aplicar rate limiting a endpoints sensibles
+        boolean isAuthEndpoint = path.startsWith("/api/users/login") || 
+                                 path.startsWith("/api/users/register") ||
+                                 path.startsWith("/api/users/refresh");
+        
+        boolean isWriteEndpoint = "POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method);
+        
+        // Aplicar rate limiting a autenticación y a operaciones de escritura
+        if (!isAuthEndpoint && !isWriteEndpoint) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,7 +50,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             info.count.set(0);
         }
 
-        if (info.count.incrementAndGet() > MAX_REQUESTS_PER_MINUTE) {
+        // Límites diferentes para autenticación y operaciones de escritura
+        int maxRequests = isAuthEndpoint ? MAX_REQUESTS_PER_MINUTE : MAX_REQUESTS_PER_MINUTE * 2;
+        
+        if (info.count.incrementAndGet() > maxRequests) {
             response.setStatus(429);
             response.setContentType("application/json");
             response.getWriter().write("{\"status\":429,\"message\":\"Demasiadas solicitudes. Intenta más tarde.\"}");

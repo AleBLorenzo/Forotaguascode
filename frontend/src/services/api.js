@@ -46,6 +46,12 @@ export const api = {
     return res.json();
   },
 
+  // Tags
+  async getTags() {
+    const res = await fetch(`${API_URL}/api/tags`);
+    return res.json();
+  },
+
   // Threads
   async getThreads(page = 0, size = 10, categoryId = null) {
     let url = `${API_URL}/api/threads?page=${page}&size=${size}`;

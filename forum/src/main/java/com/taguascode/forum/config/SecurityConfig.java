@@ -1,6 +1,7 @@
 package com.taguascode.forum.config;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -78,12 +79,24 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://127.0.0.1:5173",
-                "https://foro.taguascode.cloud",
-                "https://api.foro.taguascode.cloud"));
+        
+        // Leer URLs permitidas desde variable de entorno, separadas por coma
+        String allowedOriginsEnv = System.getenv("ALLOWED_ORIGINS");
+        List<String> allowedOrigins;
+        
+        if (allowedOriginsEnv != null && !allowedOriginsEnv.trim().isEmpty()) {
+            allowedOrigins = Arrays.asList(allowedOriginsEnv.split(","));
+        } else {
+            // Valores por defecto para desarrollo
+            allowedOrigins = Arrays.asList(
+                    "http://localhost:5173",
+                    "http://localhost:3000",
+                    "http://127.0.0.1:5173",
+                    "https://foro.taguascode.cloud",
+                    "https://api.foro.taguascode.cloud");
+        }
+        
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

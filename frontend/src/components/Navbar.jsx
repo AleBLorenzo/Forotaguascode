@@ -38,12 +38,12 @@ export default function Navbar() {
           
           {user ? (
             <>
-              <div className="nav-user">
+              <Link to="/profile" className="nav-user">
                 <div className="avatar">
                   {user.username?.charAt(0).toUpperCase()}
                 </div>
                 <span>{user.username}</span>
-              </div>
+              </Link>
               <button onClick={logout} className="btn-logout">
                 Cerrar sesión
               </button>
