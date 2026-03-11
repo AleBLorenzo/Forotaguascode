@@ -125,6 +125,12 @@ export const api = {
       headers: getAuthHeaders(),
       body: formData
     });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || `Error ${res.status}: No se pudo subir el avatar`);
+    }
+    
     return res.json();
   },
 

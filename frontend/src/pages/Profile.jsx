@@ -33,15 +33,32 @@ export default function Profile() {
 
   const handleAvatarUpload = async (e) => {
     e.preventDefault();
-    if (!avatarFile) return;
+    if (!avatarFile) {
+      setError('Por favor, selecciona un archivo');
+      return;
+    }
+
+    // Validar tamaño (5MB máximo)
+    if (avatarFile.size > 5 * 1024 * 1024) {
+      setError('El archivo no puede superar los 5MB');
+      return;
+    }
+
+    // Validar tipo de archivo
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(avatarFile.type)) {
+      setError('Solo se permiten imágenes JPG, PNG, GIF o WebP');
+      return;
+    }
 
     try {
       const result = await api.uploadAvatar(avatarFile);
       setUserData(prev => ({ ...prev, avatarUrl: result.avatarUrl }));
       setSuccess('Avatar actualizado correctamente');
+      setAvatarFile(null);
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Error al subir el avatar');
+      setError(err.message || 'Error al subir el avatar');
     }
   };
 

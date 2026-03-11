@@ -26,9 +26,13 @@ public class FileUploadController {
     private UserRepository userRepository;
 
     @PostMapping("/avatar")
-    public ResponseEntity<UserResponseDTO> uploadAvatar(
+    public ResponseEntity<?> uploadAvatar(
             @RequestParam("file") MultipartFile file,
             Principal principal) {
+        
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No se proporcionó ningún archivo");
+        }
         
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElse(null);
@@ -43,8 +47,11 @@ public class FileUploadController {
             user = userRepository.save(user);
             
             return ResponseEntity.ok(toDTO(user));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error al subir el archivo: " + e.getMessage());
         }
     }
 

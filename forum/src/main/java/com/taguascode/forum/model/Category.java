@@ -31,7 +31,7 @@ public class Category {
     @Column(nullable = false, length = 500)
     private String description;
 
-    @Column(name = "icon_url", updatable = false, length = 500)
+    @Column(name = "icon_url", length = 500)
     private String iconUrl;
 
     @Column(name = "display_order")
@@ -40,4 +40,11 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Thread> threads;
 
+    // Constructor para inicialización
+    public Category(String name, String description, String iconUrl, int displayOrder) {
+        this.name = name;
+        this.description = description;
+        this.iconUrl = iconUrl;
+        this.displayOrder = displayOrder;
+    }
 }
