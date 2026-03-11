@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <div className="home-layout">
-      <div className="main-content-home">
+      <div className="main-column">
         <div className="hero">
           <h1>🌴 Bienvenido a Forotaguas</h1>
           <p>Únete a la comunidad, comparte conocimientos y aprende</p>
