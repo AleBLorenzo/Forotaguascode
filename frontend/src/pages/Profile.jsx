@@ -81,7 +81,11 @@ export default function Profile() {
         <div className="profile-info">
           <div className="profile-avatar">
             <div className="avatar-large">
-              {userData.username?.charAt(0).toUpperCase()}
+              {userData.avatarUrl ? (
+                <img src={userData.avatarUrl} alt={userData.username} />
+              ) : (
+                userData.username?.charAt(0).toUpperCase()
+              )}
             </div>
             <form onSubmit={handleAvatarUpload} className="avatar-upload-form">
               <input

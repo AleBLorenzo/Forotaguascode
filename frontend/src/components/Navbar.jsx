@@ -40,7 +40,11 @@ export default function Navbar() {
             <>
               <Link to="/profile" className="nav-user">
                 <div className="avatar">
-                  {user.username?.charAt(0).toUpperCase()}
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.username} />
+                  ) : (
+                    user.username?.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <span>{user.username}</span>
               </Link>
