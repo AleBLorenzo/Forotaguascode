@@ -45,10 +45,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login").permitAll()
                         .requestMatchers("/api/users/refresh").permitAll()
 
-                        // Lectura pública de hilos y categorías
+                        // Lectura pública de hilos, categorías y etiquetas
                         .requestMatchers(HttpMethod.GET, "/api/threads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
 
                         // ── Solo ADMIN ────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
@@ -95,7 +96,9 @@ public class SecurityConfig {
                     "http://localhost:8081",
                     "https://foro.taguascode.cloud",
                     "http://foro.taguascode.cloud",
-                    "https://api.foro.taguascode.cloud");
+                    "https://api.foro.taguascode.cloud",
+                    "https://www.foro.taguascode.cloud",
+                    "http://www.foro.taguascode.cloud");
         }
         
         configuration.setAllowedOrigins(allowedOrigins);

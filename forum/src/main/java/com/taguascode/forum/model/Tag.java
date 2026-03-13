@@ -32,4 +32,10 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags") // ya definida en Thread
     private List<Thread> threads;
+
+    // Constructor para inicialización
+    public Tag(String name, String color) {
+        this.name = name;
+        this.color = color;
+    }
 }
