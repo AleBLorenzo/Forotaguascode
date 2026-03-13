@@ -11,6 +11,7 @@ export default function NewThread() {
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -35,15 +36,14 @@ export default function NewThread() {
     }
   };
 
-  const handleTagChange = (e) => {
-    const options = e.target.options;
-    const selected = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(parseInt(options[i].value));
+  const handleTagToggle = (tagId) => {
+    setSelectedTags(prev => {
+      const id = parseInt(tagId);
+      if (prev.includes(id)) {
+        return prev.filter(t => t !== id);
       }
-    }
-    setSelectedTags(selected);
+      return [...prev, id];
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -52,6 +52,10 @@ export default function NewThread() {
 
     if (!title.trim()) {
       setError('El título es obligatorio');
+      return;
+    }
+    if (title.trim().length < 5) {
+      setError('El título debe tener al menos 5 caracteres');
       return;
     }
     if (!content.trim()) {
@@ -63,106 +67,227 @@ export default function NewThread() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const result = await api.createThread(title, parseInt(categoryId), content, selectedTags);
       if (result.id) {
-        navigate(`/thread/${result.id}`);
+        navigate(`/thread/${result.id}`, { 
+          state: { message: '¡Hilo creado correctamente!' } 
+        });
       } else {
         setError(result.message || 'Error al crear el hilo');
       }
     } catch (error) {
       console.error('Error creating thread:', error);
-      setError('Error de conexión o servidor');
+      setError('Error de conexión. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (!user) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
+      <div className="auth-required">
+        <div className="auth-required-content">
+          <div className="auth-required-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
           <h2>Acceso requerido</h2>
           <p>Debes iniciar sesión para crear un hilo.</p>
-          <button onClick={() => navigate('/login')} className="btn-primary">
-            Iniciar sesión
-          </button>
+          <div className="auth-required-actions">
+            <button onClick={() => navigate('/login')} className="btn btn-primary">
+              Iniciar sesión
+            </button>
+            <button onClick={() => navigate('/register')} className="btn btn-secondary">
+              Crear cuenta
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   if (loading) {
-    return <div className="loading">Cargando...</div>;
+    return (
+      <div className="loading-container" role="status" aria-live="polite">
+        <div className="loading-spinner"></div>
+        <p>Cargando formulario…</p>
+      </div>
+    );
   }
 
   return (
-    <div className="new-thread-container">
+    <div className="new-thread-page">
       <div className="new-thread-card">
-        <h2>Crear Nuevo Hilo</h2>
+        <header className="form-header">
+          <h1>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Crear Nuevo Hilo
+          </h1>
+          <p>Comparte tu pregunta o conocimiento con la comunidad</p>
+        </header>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="alert alert-error" role="alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate className="thread-form">
           <div className="form-group">
-            <label>Título</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              placeholder="Título del hilo"
-            />
+            <label htmlFor="thread-title">
+              Título <span className="required">*</span>
+            </label>
+            <div className="input-wrapper">
+              <input
+                id="thread-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder="¿Cuál es tu pregunta o tema?"
+                minLength={5}
+                maxLength={200}
+                disabled={isSubmitting}
+                aria-describedby="title-hint"
+              />
+            </div>
+            <span id="title-hint" className="input-hint">
+              Sé específico y claro ({title.length}/200 caracteres)
+            </span>
           </div>
 
           <div className="form-group">
-            <label>Categoría</label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              required
-            >
-              <option value="">Selecciona una categoría</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <label htmlFor="thread-category">
+              Categoría <span className="required">*</span>
+            </label>
+            <div className="select-wrapper">
+              <select
+                id="thread-category"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                required
+                disabled={isSubmitting}
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="form-group">
-            <label>Etiquetas (opcional)</label>
-            <select
-              multiple
-              value={selectedTags}
-              onChange={handleTagChange}
-              className="tag-select"
-            >
-              {tags.map(tag => (
-                <option key={tag.id} value={tag.id}>
-                  {tag.name}
-                </option>
-              ))}
-            </select>
-            <small>Mantén Ctrl (Cmd en Mac) pulsado para seleccionar múltiples etiquetas</small>
+            <label htmlFor="thread-tags">
+              Etiquetas <span className="optional">(opcional)</span>
+            </label>
+            <div className="tags-selector" role="group" aria-label="Seleccionar etiquetas">
+              {tags.length === 0 ? (
+                <p className="no-tags">No hay etiquetas disponibles</p>
+              ) : (
+                <div className="tags-grid">
+                  {tags.map(tag => (
+                    <label 
+                      key={tag.id} 
+                      className={`tag-option ${selectedTags.includes(tag.id) ? 'selected' : ''}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTags.includes(tag.id)}
+                        onChange={() => handleTagToggle(tag.id)}
+                        disabled={isSubmitting}
+                      />
+                      <span className="tag-name">{tag.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            <span className="input-hint">
+              Selecciona hasta 5 etiquetas relevantes para tu hilo
+            </span>
           </div>
 
           <div className="form-group">
-            <label>Contenido</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              placeholder="Escribe el contenido de tu hilo..."
-              rows={10}
-            />
+            <label htmlFor="thread-content">
+              Contenido <span className="required">*</span>
+            </label>
+            <div className="textarea-wrapper">
+              <textarea
+                id="thread-content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                placeholder="Describe tu pregunta o tema en detalle. Incluye toda la información relevante que pueda ayudar a otros a responder mejor…"
+                rows={12}
+                disabled={isSubmitting}
+                aria-describedby="content-hint"
+              />
+            </div>
+            <span id="content-hint" className="input-hint">
+              Incluye código, errores o contexto relevante
+            </span>
+          </div>
+
+          <div className="form-tips">
+            <h3>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              Consejos para una buena publicación
+            </h3>
+            <ul>
+              <li>Selecciona una categoría adecuada para tu hilo</li>
+              <li>Usa un título claro y descriptivo</li>
+              <li>Proporciona contexto y detalles relevantes</li>
+              <li>Si es un error, incluye el código o mensaje de error</li>
+            </ul>
           </div>
 
           <div className="form-actions">
-            <button type="button" onClick={() => navigate(-1)} className="btn-secondary">
+            <button 
+              type="button" 
+              onClick={() => navigate(-1)} 
+              className="btn btn-secondary"
+              disabled={isSubmitting}
+            >
               Cancelar
             </button>
-            <button type="submit" className="btn-primary">
-              Crear Hilo
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="spinner" aria-hidden="true"></span>
+                  Creando hilo…
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                  Publicar Hilo
+                </>
+              )}
             </button>
           </div>
         </form>

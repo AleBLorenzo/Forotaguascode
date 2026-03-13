@@ -53,8 +53,8 @@ export const api = {
   },
 
   // Threads
-  async getThreads(page = 0, size = 10, categoryId = null) {
-    let url = `${API_URL}/api/threads?page=${page}&size=${size}`;
+  async getThreads(page = 0, size = 10, categoryId = null, orderBy = 'createdAt') {
+    let url = `${API_URL}/api/threads?page=${page}&size=${size}&sort=${orderBy},desc`;
     if (categoryId) url += `&categoryId=${categoryId}`;
     const res = await fetch(url);
     return res.json();
