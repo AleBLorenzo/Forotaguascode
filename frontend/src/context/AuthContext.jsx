@@ -40,11 +40,24 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (username, email, password) => {
-    const data = await api.register(username, email, password);
-    if (data.id) {
-      return { success: true };
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        // El registro fue exitoso, devuelve el usuario creado o un indicador de éxito
+        return { success: true, ...data };
+      }
+      
+      return { success: false, message: data.message || 'Error al crear la cuenta' };
+    } catch (err) {
+      return { success: false, message: 'Error de conexión. Inténtalo de nuevo.' };
     }
-    return { success: false, error: data.message || 'Registration failed' };
   };
 
   const logout = () => {

@@ -35,7 +35,7 @@ export default function Register() {
 
     try {
       const result = await register(username, email, password);
-      if (result.id || result.username) {
+      if (result.success) {
         navigate('/login', { state: { message: 'Cuenta creada correctamente. Ahora puedes iniciar sesión.' } });
       } else {
         setError(result.message || 'Error al crear la cuenta');
