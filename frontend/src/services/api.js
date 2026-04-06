@@ -46,15 +46,21 @@ export const api = {
     return res.json();
   },
 
-  async createCategory(name, description, iconUrl = null) {
+  async createCategory(name, description, iconUrl = null, order = 0) {
     const res = await fetch(`${API_URL}/api/categories`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeaders()
       },
-      body: JSON.stringify({ name, description, iconUrl })
+      body: JSON.stringify({ name, description, iconUrl, order })
     });
+    
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: 'Error del servidor' }));
+      throw new Error(error.message || `Error ${res.status}`);
+    }
+    
     return res.json();
   },
 

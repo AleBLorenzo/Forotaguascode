@@ -49,18 +49,23 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryCreateDTO dto) {
-        if (categoryRepository.existsByName(dto.getName())) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (categoryRepository.existsByName(dto.getName())) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Category category = new Category();
+            category.setName(dto.getName());
+            category.setDescription(dto.getDescription());
+            category.setIconUrl(dto.getIconUrl());
+            category.setDisplayOrder(dto.getOrder());
+
+            Category saved = categoryRepository.save(category);
+            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(saved));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        Category category = new Category();
-        category.setName(dto.getName());
-        category.setDescription(dto.getDescription());
-        category.setIconUrl(dto.getIconUrl());
-        category.setDisplayOrder(dto.getOrder());
-
-        Category saved = categoryRepository.save(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -74,7 +79,10 @@ public class CategoryController {
     }
 
     private CategoryResponseDTO toDTO(Category category) {
-        long totalThreads = category.getThreads() != null ? category.getThreads().size() : 0;
+        long totalThreads = 0;
+        if (category.getThreads() != null) {
+            totalThreads = category.getThreads().size();
+        }
         
         return new CategoryResponseDTO(
                 category.getId(),

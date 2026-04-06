@@ -43,19 +43,16 @@ export default function AdminCategories() {
       const result = await api.createCategory(
         newCategory.name,
         newCategory.description,
-        newCategory.iconUrl || null
+        newCategory.iconUrl || null,
+        0
       );
       
-      if (result.id) {
-        setSuccess('Categoría creada correctamente');
-        setNewCategory({ name: '', description: '', iconUrl: '' });
-        setShowForm(false);
-        loadCategories();
-      } else {
-        setError(result.message || 'Error al crear la categoría');
-      }
+      setSuccess('Categoría creada correctamente');
+      setNewCategory({ name: '', description: '', iconUrl: '' });
+      setShowForm(false);
+      loadCategories();
     } catch (err) {
-      setError('Error de conexión. Inténtalo de nuevo.');
+      setError(err.message || 'Error al crear la categoría');
     } finally {
       setIsSubmitting(false);
     }
