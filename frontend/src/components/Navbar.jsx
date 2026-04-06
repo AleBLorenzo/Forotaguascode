@@ -78,8 +78,19 @@ export default function Navbar() {
           className={`navbar-links ${isMenuOpen ? 'open' : ''}`} 
           id="main-menu"
         >
-          <Link to="/" className="nav-link">Inicio</Link>
-          <Link to="/threads" className="nav-link">Hilos</Link>
+          <Link to="/" className="nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Inicio
+          </Link>
+          <Link to="/threads" className="nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Hilos
+          </Link>
           
           {/* Theme Toggle Button */}
           <button 
@@ -124,16 +135,30 @@ export default function Navbar() {
                 className="btn-logout"
                 type="button"
               >
-                Cerrar sesión
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span className="logout-text">Cerrar sesión</span>
               </button>
             </>
           ) : (
             <div className="auth-buttons">
               <Link to="/login" className="btn-login">
-                Iniciar Sesión
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
+                </svg>
+                <span className="btn-text">Iniciar Sesión</span>
               </Link>
               <Link to="/register" className="btn-register">
-                Registrarse
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="8.5" cy="7" r="4"/>
+                  <line x1="20" y1="8" x2="20" y2="14"/>
+                  <line x1="23" y1="11" x2="17" y2="11"/>
+                </svg>
+                <span className="btn-text">Registrarse</span>
               </Link>
             </div>
           )}

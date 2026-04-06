@@ -23,6 +23,7 @@ import com.taguascode.forum.dto.user.TokenResponseDTO;
 import com.taguascode.forum.dto.user.UserLoginDTO;
 import com.taguascode.forum.dto.user.UserRegisterDTO;
 import com.taguascode.forum.dto.user.UserResponseDTO;
+import com.taguascode.forum.exception.ApiError;
 import com.taguascode.forum.model.User;
 import com.taguascode.forum.repository.UserRepository;
 
@@ -43,12 +44,12 @@ public class UserController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ApiError(400, "El email ya está registrado", "/api/users/register", java.time.LocalDateTime.now()));
         }
         if (userRepository.existsByUsername(dto.getUsername())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ApiError(400, "El nombre de usuario ya está en uso", "/api/users/register", java.time.LocalDateTime.now()));
         }
 
         User user = new User();

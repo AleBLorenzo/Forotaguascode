@@ -43,6 +43,11 @@ export default function ThreadList() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const getCategoryTitle = () => {
+    if (categoryId) return `Hilos de Categoría`;
+    return 'Todos los Hilos';
+  };
+
   if (loading) {
     return (
       <div className="loading-container" role="status" aria-live="polite">
@@ -57,10 +62,10 @@ export default function ThreadList() {
       <header className="page-header">
         <div className="page-header-content">
           <h1>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
-            {categoryId ? `Hilos de Categoría` : 'Todos los Hilos'}
+            {getCategoryTitle()}
           </h1>
           <p className="page-subtitle">
             {formatNumber(threads.totalElements || 0)} hilos disponibles
@@ -69,7 +74,7 @@ export default function ThreadList() {
         
         {user && (
           <Link to="/thread/new" className="btn btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
@@ -85,7 +90,7 @@ export default function ThreadList() {
             onClick={() => setSortBy('recent')}
             aria-pressed={sortBy === 'recent'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12 6 12 12 16 14"/>
             </svg>
@@ -96,7 +101,7 @@ export default function ThreadList() {
             onClick={() => setSortBy('popular')}
             aria-pressed={sortBy === 'popular'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
@@ -107,7 +112,7 @@ export default function ThreadList() {
             onClick={() => setSortBy('activity')}
             aria-pressed={sortBy === 'activity'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
             Activos
@@ -118,11 +123,11 @@ export default function ThreadList() {
       {threads.content.length === 0 ? (
         <div className="empty-state" role="status">
           <div className="empty-icon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
           </div>
-          <h3>No hay hilos en esta categoría</h3>
+          <h3>No hay hilos todavía</h3>
           <p>¡Sé el primero en iniciar una conversación!</p>
           {user && (
             <Link to="/thread/new" className="btn btn-primary">
@@ -144,7 +149,7 @@ export default function ThreadList() {
                   <h3>
                     {thread.pinned && (
                       <span className="badge badge-pinned">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
                         </svg>
                         Fijado
@@ -152,7 +157,7 @@ export default function ThreadList() {
                     )}
                     {thread.locked && (
                       <span className="badge badge-locked">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                         </svg>
@@ -163,11 +168,11 @@ export default function ThreadList() {
                   </h3>
                   <div className="thread-meta">
                     <span className="meta-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                       </svg>
-                      Por {thread.authorUsername}
+                      {thread.authorUsername}
                     </span>
                     <span className="meta-separator" aria-hidden="true">•</span>
                     <span className="meta-item">
@@ -180,6 +185,9 @@ export default function ThreadList() {
                   </div>
                 </div>
                 <div className="thread-category-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                  </svg>
                   {thread.categoryName}
                 </div>
               </Link>
@@ -194,7 +202,7 @@ export default function ThreadList() {
                 onClick={() => handlePageChange(page - 1)}
                 aria-label="Página anterior"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="15 18 9 12 15 6"/>
                 </svg>
                 Anterior
@@ -213,7 +221,7 @@ export default function ThreadList() {
                 aria-label="Página siguiente"
               >
                 Siguiente
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6"/>
                 </svg>
               </button>

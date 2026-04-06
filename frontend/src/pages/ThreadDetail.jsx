@@ -148,7 +148,7 @@ export default function ThreadDetail() {
     return (
       <div className="error-state" role="alert">
         <div className="error-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -262,7 +262,7 @@ export default function ThreadDetail() {
 
       <section className="posts-section" aria-labelledby="posts-heading" ref={postsRef}>
         <h2 id="posts-heading" className="section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
           Respuestas ({formatNumber(thread.postCount)})
@@ -308,7 +308,7 @@ export default function ThreadDetail() {
                       aria-label={likedPosts.has(post.id) ? 'Quitar me gusta' : 'Me gusta'}
                       aria-pressed={likedPosts.has(post.id)}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill={likedPosts.has(post.id) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill={likedPosts.has(post.id) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
                         <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
                       </svg>
                       <span>{formatNumber(post.likes || 0)}</span>
@@ -331,13 +331,13 @@ export default function ThreadDetail() {
                 id="reply-content"
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
-                placeholder="Escribe tu respuesta…"
-                rows={5}
+                placeholder="Escribe tu respuesta… Comparte tu conocimiento o pregunta"
+                rows={6}
                 disabled={isSubmitting}
                 aria-describedby="reply-hint"
               />
               <span id="reply-hint" className="input-hint">
-                Comparte tu conocimiento o pregunta
+                Sea respetuoso y constructivo
               </span>
             </div>
             <div className="form-actions">
@@ -366,18 +366,31 @@ export default function ThreadDetail() {
         </section>
       ) : thread.locked ? (
         <div className="locked-notice" role="alert">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
           Este hilo está bloqueado. No puedes publicar nuevas respuestas.
         </div>
       ) : (
-        <div className="login-prompt">
-          <p>
-            <Link to="/login" className="btn btn-primary">Inicia sesión</Link>
-            {' '}para publicar una respuesta
-          </p>
+        <div className="auth-required">
+          <div className="auth-required-content">
+            <div className="auth-required-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
+              </svg>
+            </div>
+            <h2>Inicia sesión para responder</h2>
+            <p>Únete a la comunidad para participar en las conversaciones</p>
+            <div className="auth-required-actions">
+              <Link to="/login" className="btn btn-primary">
+                Iniciar sesión
+              </Link>
+              <Link to="/register" className="btn btn-secondary">
+                Crear cuenta
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </div>
