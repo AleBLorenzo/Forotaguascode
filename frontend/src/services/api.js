@@ -64,6 +64,38 @@ export const api = {
     return res.json();
   },
 
+  async updateCategory(id, name, description, iconUrl = null, order = 0) {
+    const res = await fetch(`${API_URL}/api/categories/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify({ name, description, iconUrl, order })
+    });
+    
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: 'Error del servidor' }));
+      throw new Error(error.message || `Error ${res.status}`);
+    }
+    
+    return res.json();
+  },
+
+  async deleteCategory(id) {
+    const res = await fetch(`${API_URL}/api/categories/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    
+    if (!res.ok) {
+      const error = await res.text().catch(() => 'Error del servidor');
+      throw new Error(error || `Error ${res.status}`);
+    }
+    
+    return true;
+  },
+
   // Tags
   async getTags() {
     const res = await fetch(`${API_URL}/api/tags`);

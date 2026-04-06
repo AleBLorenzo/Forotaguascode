@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,10 +12,11 @@ export default function AdminCategories() {
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: '', description: '', iconUrl: '' });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Solo admins pueden acceder
     if (!user || user.role !== 'ADMIN') {
       navigate('/');
       return;
@@ -40,7 +41,7 @@ export default function AdminCategories() {
     setIsSubmitting(true);
 
     try {
-      const result = await api.createCategory(
+      await api.createCategory(
         newCategory.name,
         newCategory.description,
         newCategory.iconUrl || null,
@@ -55,6 +56,45 @@ export default function AdminCategories() {
       setError(err.message || 'Error al crear la categoría');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    if (!editingCategory) return;
+    
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      await api.updateCategory(
+        editingCategory.id,
+        editingCategory.name,
+        editingCategory.description,
+        editingCategory.iconUrl || null,
+        editingCategory.order || 0
+      );
+      
+      setSuccess('Categoría actualizada correctamente');
+      setEditingCategory(null);
+      loadCategories();
+    } catch (err) {
+      setError(err.message || 'Error al actualizar la categoría');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setError('');
+    
+    try {
+      await api.deleteCategory(id);
+      setSuccess('Categoría eliminada correctamente');
+      setShowDeleteConfirm(null);
+      loadCategories();
+    } catch (err) {
+      setError(err.message || 'Error al eliminar la categoría');
     }
   };
 
@@ -84,7 +124,7 @@ export default function AdminCategories() {
           <p className="page-subtitle">Administra las categorías del foro</p>
         </div>
         <button 
-          onClick={() => setShowForm(!showForm)} 
+          onClick={() => { setShowForm(!showForm); setEditingCategory(null); }} 
           className="btn btn-primary"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -116,7 +156,7 @@ export default function AdminCategories() {
         </div>
       )}
 
-      {showForm && (
+      {showForm && !editingCategory && (
         <div className="admin-form-card">
           <h2>Crear Nueva Categoría</h2>
           <form onSubmit={handleSubmit} className="admin-form">
@@ -192,6 +232,83 @@ export default function AdminCategories() {
         </div>
       )}
 
+      {editingCategory && (
+        <div className="admin-form-card">
+          <h2>Editar Categoría</h2>
+          <form onSubmit={handleEdit} className="admin-form">
+            <div className="form-group">
+              <label htmlFor="edit-category-name">Nombre <span className="required">*</span></label>
+              <input
+                id="edit-category-name"
+                type="text"
+                value={editingCategory.name}
+                onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                required
+                placeholder="Nombre de la categoría"
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-category-description">Descripción <span className="required">*</span></label>
+              <textarea
+                id="edit-category-description"
+                value={editingCategory.description}
+                onChange={(e) => setEditingCategory({ ...editingCategory, description: e.target.value })}
+                required
+                placeholder="Descripción de la categoría"
+                rows={3}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-category-icon">Icono (URL) <span className="optional">(opcional)</span></label>
+              <input
+                id="edit-category-icon"
+                type="url"
+                value={editingCategory.iconUrl || ''}
+                onChange={(e) => setEditingCategory({ ...editingCategory, iconUrl: e.target.value })}
+                placeholder="https://ejemplo.com/icono.png"
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-actions">
+              <button 
+                type="button" 
+                onClick={() => setEditingCategory(null)} 
+                className="btn btn-secondary"
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner" aria-hidden="true"></span>
+                    Guardando…
+                  </>
+                ) : (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                      <polyline points="17 21 17 13 7 13 7 21"/>
+                      <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Guardar Cambios
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       <div className="admin-list">
         {categories.length === 0 ? (
           <div className="empty-state">
@@ -224,13 +341,30 @@ export default function AdminCategories() {
                 <div className="category-description">{category.description}</div>
                 <div className="category-count">{category.totalThreads || 0}</div>
                 <div className="category-actions">
-                  <button className="btn-icon" title="Editar">
+                  <button 
+                    className="btn-icon" 
+                    title="Editar"
+                    onClick={() => { 
+                      setEditingCategory({ 
+                        id: category.id, 
+                        name: category.name, 
+                        description: category.description, 
+                        iconUrl: category.iconUrl,
+                        order: 0
+                      }); 
+                      setShowForm(false); 
+                    }}
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                   </button>
-                  <button className="btn-icon btn-icon-danger" title="Eliminar">
+                  <button 
+                    className="btn-icon btn-icon-danger" 
+                    title="Eliminar"
+                    onClick={() => setShowDeleteConfirm(category.id)}
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="3 6 5 6 21 6"/>
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -242,6 +376,30 @@ export default function AdminCategories() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+          <div className="modal-content">
+            <h2 id="delete-title">Confirmar eliminación</h2>
+            <p>¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se puede deshacer.</p>
+            <div className="modal-actions">
+              <button 
+                onClick={() => setShowDeleteConfirm(null)} 
+                className="btn btn-secondary"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => handleDelete(showDeleteConfirm)} 
+                className="btn btn-danger"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

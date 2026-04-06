@@ -71,11 +71,43 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!categoryRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        try {
+            if (!categoryRepository.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            categoryRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        categoryRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponseDTO> update(@PathVariable Long id, @RequestBody CategoryCreateDTO dto) {
+        try {
+            return categoryRepository.findById(id)
+                    .map(category -> {
+                        // Verificar si el nombre ya existe en otra categoría
+                        if (categoryRepository.findByName(dto.getName()).isPresent() 
+                                && !category.getName().equals(dto.getName())) {
+                            return ResponseEntity.badRequest().<CategoryResponseDTO>build();
+                        }
+                        
+                        category.setName(dto.getName());
+                        category.setDescription(dto.getDescription());
+                        category.setIconUrl(dto.getIconUrl());
+                        category.setDisplayOrder(dto.getOrder());
+                        
+                        Category saved = categoryRepository.save(category);
+                        return ResponseEntity.ok(toDTO(saved));
+                    })
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     private CategoryResponseDTO toDTO(Category category) {
