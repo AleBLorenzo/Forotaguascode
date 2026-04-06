@@ -28,11 +28,13 @@ import com.taguascode.forum.model.Category;
 import com.taguascode.forum.model.Post;
 import com.taguascode.forum.model.Tag;
 import com.taguascode.forum.model.Thread;
+import com.taguascode.forum.model.ThreadView;
 import com.taguascode.forum.model.User;
 import com.taguascode.forum.repository.CategoryRepository;
 import com.taguascode.forum.repository.PostRepository;
 import com.taguascode.forum.repository.TagRepository;
 import com.taguascode.forum.repository.ThreadRepository;
+import com.taguascode.forum.repository.ThreadViewRepository;
 import com.taguascode.forum.repository.UserRepository;
 
 @RestController
@@ -53,6 +55,9 @@ public class ThreadController {
 
     @Autowired
     private TagRepository tagRepository;
+
+    @Autowired
+    private ThreadViewRepository threadViewRepository;
 
     @GetMapping
     public ResponseEntity<Page<ThreadResponseDTO>> getAll(
@@ -91,11 +96,24 @@ public class ThreadController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ThreadResponseDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<ThreadResponseDTO> getById(@PathVariable Long id, Principal principal) {
         return threadRepository.findById(id)
                 .map(thread -> {
-                    thread.setViews(thread.getViews() + 1);
-                    threadRepository.save(thread);
+                    // Solo incrementar vistas si el usuario no ha visto este hilo antes
+                    if (principal != null) {
+                        User currentUser = userRepository.findByEmail(principal.getName()).orElse(null);
+                        if (currentUser != null && !threadViewRepository.existsByThreadAndUser(thread, currentUser)) {
+                            // Registrar la vista
+                            ThreadView threadView = new ThreadView();
+                            threadView.setThread(thread);
+                            threadView.setUser(currentUser);
+                            threadViewRepository.save(threadView);
+                            
+                            // Incrementar contador de vistas
+                            thread.setViews(thread.getViews() + 1);
+                            threadRepository.save(thread);
+                        }
+                    }
                     return ResponseEntity.ok(toDTO(thread));
                 })
                 .orElse(ResponseEntity.notFound().build());

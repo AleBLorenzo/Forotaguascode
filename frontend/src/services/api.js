@@ -46,6 +46,18 @@ export const api = {
     return res.json();
   },
 
+  async createCategory(name, description, iconUrl = null) {
+    const res = await fetch(`${API_URL}/api/categories`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify({ name, description, iconUrl })
+    });
+    return res.json();
+  },
+
   // Tags
   async getTags() {
     const res = await fetch(`${API_URL}/api/tags`);
