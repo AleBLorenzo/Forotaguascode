@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.taguascode.forum.dto.category.CategoryCreateDTO;
 import com.taguascode.forum.dto.category.CategoryResponseDTO;
 import com.taguascode.forum.model.Category;
-import com.taguascode.forum.model.Thread;
 import com.taguascode.forum.repository.CategoryRepository;
 import com.taguascode.forum.repository.ThreadRepository;
 
