@@ -166,7 +166,7 @@ export default function ThreadDetail() {
   }
 
   return (
-    <>
+    <div className="thread-detail">
       <SEOHead 
         title={thread.title}
         description={thread.firstPostContent?.substring(0, 160) || `Hilo en ${thread.categoryName}. ${thread.postCount} respuestas.`}
@@ -408,8 +408,7 @@ export default function ThreadDetail() {
             </div>
           </div>
         </div>
-      )}
+        )}
     </div>
-    </>
   );
 }

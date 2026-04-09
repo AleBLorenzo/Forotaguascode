@@ -49,13 +49,12 @@ export default function Register() {
   };
 
   return (
-    <>
+    <div className="auth-container">
       <SEOHead 
         title="Crear Cuenta"
         description="Únete a la comunidad de Forotaguascode. Comparte conocimientos y conecta con otros desarrolladores."
         noIndex={true}
       />
-      <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-icon">

@@ -118,13 +118,12 @@ export default function Profile() {
   }
 
   return (
-    <>
+    <div className="profile-page">
       <SEOHead 
         title={`Perfil de ${userData?.username || 'Usuario'}`}
         description={`Perfil de usuario en Forotaguascode`}
         noIndex={true}
       />
-      <div className="profile-page">
       <div className="profile-card">
         <header className="profile-header">
           <div className="profile-avatar-section">

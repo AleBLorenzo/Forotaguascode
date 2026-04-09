@@ -59,12 +59,11 @@ export default function Home() {
   }
 
   return (
-    <>
+    <div className="home-layout">
       <SEOHead 
         title="Foro de Programación"
         description="Comunidad de desarrolladores. Comparte conocimientos, resuelve dudas y conecta con otros programadores."
       />
-      <div className="home-layout">
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
       
@@ -337,6 +336,6 @@ export default function Home() {
           </ul>
         </div>
       </aside>
-    </>
+    </div>
   );
 }

@@ -65,12 +65,11 @@ export default function ThreadList() {
   }
 
   return (
-    <>
+    <div className="thread-list-page">
       <SEOHead 
         title={pageTitle}
         description={pageDescription}
       />
-      <div className="thread-list-page">
       <header className="page-header">
         <div className="page-header-content">
           <h1>
