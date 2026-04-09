@@ -29,35 +29,38 @@ public class Thread {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)  
-      private Long id;
+    private Long id;
 
-      @Column(nullable= false , length= 100)
+    @Column(nullable= false , length= 100)
     private String title;
 
-     @Column(nullable = false)
+    @Column(nullable = false)
     private boolean pinned = false; 
 
-     @Column(nullable = false)       // fijado arriba
-    private boolean locked = false;        // cerrado a respuestas
+    @Column(nullable = false)       
+    private boolean locked = false;        
     
     @Column(nullable = false)
     private int views = 0;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
-     @ManyToOne                          // muchos hilos pertenecen a un usuario
+    @Column(name = "updated_at", insertable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne                          
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @ManyToOne                          // muchos hilos pertenecen a una categoría
+    @ManyToOne                          
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL)   // un hilo tiene muchos posts
+    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL)   
     private List<Post> posts;
 
-    @ManyToMany                         // muchos hilos tienen muchas tags
+    @ManyToMany                         
     @JoinTable(
         name = "thread_tags",
         joinColumns = @JoinColumn(name = "thread_id"),
@@ -68,6 +71,7 @@ public class Thread {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
 }

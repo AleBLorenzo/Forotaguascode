@@ -1,5 +1,6 @@
 package com.taguascode.forum.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +28,7 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String name; // "Tecnología", "General"...
+    private String name;
 
     @Column(nullable = false, length = 500)
     private String description;
@@ -37,10 +39,21 @@ public class Category {
     @Column(name = "display_order")
     private int displayOrder;
 
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", insertable = false)
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "category")
     private List<Thread> threads;
 
-    // Constructor para inicialización
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Category(String name, String description, String iconUrl, int displayOrder) {
         this.name = name;
         this.description = description;
