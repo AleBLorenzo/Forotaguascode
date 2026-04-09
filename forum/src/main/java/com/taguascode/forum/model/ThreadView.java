@@ -31,8 +31,11 @@ public class ThreadView {
     private Thread thread;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;  // Nullable - para usuarios anónimos
+
+    @Column(name = "ip_address", length = 45)  // IPv6 capaz
+    private String ipAddress;
 
     @Column(name = "viewed_at", updatable = false)
     private LocalDateTime viewedAt;
