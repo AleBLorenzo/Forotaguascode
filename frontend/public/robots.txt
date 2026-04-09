@@ -1,0 +1,14 @@
+# robots.txt - Forotaguascode
+User-agent: *
+Allow: /
+
+# Rutas no indexables
+Disallow: /api/
+Disallow: /auth/
+Disallow: /uploads/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /thread/new
+
+# Sitemap
+Sitemap: https://foro.taguascode.cloud/sitemap.xml
