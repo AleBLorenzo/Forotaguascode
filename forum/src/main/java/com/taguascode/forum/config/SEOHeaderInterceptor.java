@@ -38,18 +38,35 @@ public class SEOHeaderInterceptor implements HandlerInterceptor {
     
     /**
      * Determina si una ruta es pública y debe indexarse
+     * Incluye rutas del frontend (SPA)
      */
     private boolean isPublicPage(String uri) {
-        return uri.equals("/") ||
-               uri.equals("/index.html") ||
-               uri.equals("/categories") ||
-               uri.equals("/tags") ||
-               uri.equals("/search") ||
-               uri.startsWith("/category/") ||
-               uri.startsWith("/thread/") ||
-               uri.startsWith("/tag/") ||
-               uri.equals("/sitemap.xml") ||
-               uri.equals("/robots.txt");
+        // Rutas principales
+        if (uri.equals("/") || uri.equals("")) return true;
+        
+        // Rutas del frontend (React Router)
+        if (uri.equals("/index.html") ||
+            uri.equals("/categories") ||
+            uri.equals("/tags") ||
+            uri.equals("/search") ||
+            uri.equals("/threads") ||
+            uri.startsWith("/category/") ||
+            uri.startsWith("/thread/") ||
+            uri.startsWith("/tag/") ||
+            uri.equals("/login") ||
+            uri.equals("/register") ||
+            uri.endsWith(".js") ||
+            uri.endsWith(".css") ||
+            uri.endsWith(".ico") ||
+            uri.endsWith(".png") ||
+            uri.endsWith(".jpg") ||
+            uri.endsWith(".svg") ||
+            uri.equals("/sitemap.xml") ||
+            uri.equals("/robots.txt")) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
@@ -60,7 +77,10 @@ public class SEOHeaderInterceptor implements HandlerInterceptor {
                uri.startsWith("/auth/") ||
                uri.startsWith("/admin/") ||
                uri.startsWith("/uploads/") ||
-               uri.contains("/profile") ||
+               uri.equals("/login") ||
+               uri.equals("/register") ||
+               uri.equals("/profile") ||
+               uri.equals("/thread/new") ||
                uri.contains("/settings") ||
                uri.contains("/messages") ||
                uri.startsWith("/static/");

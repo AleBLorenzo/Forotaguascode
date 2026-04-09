@@ -64,7 +64,7 @@ export default function Home() {
         title="Foro de Programación"
         description="Comunidad de desarrolladores. Comparte conocimientos, resuelve dudas y conecta con otros programadores."
       />
-      <className="home-layout">
+      <div className="home-layout">
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
       

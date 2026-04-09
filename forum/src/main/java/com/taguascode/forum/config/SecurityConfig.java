@@ -51,6 +51,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
 
+                        // Rutas públicas de SEO
+                        .requestMatchers("/sitemap.xml").permitAll()
+                        .requestMatchers("/robots.txt").permitAll()
+                        .requestMatchers("/").permitAll()
+
                         // ── Solo ADMIN ────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
