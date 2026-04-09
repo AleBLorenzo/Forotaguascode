@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -97,22 +96,15 @@ public class ThreadController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ThreadResponseDTO> getById(@PathVariable Long id, Principal principal, HttpServletRequest request) {
+    public ResponseEntity<ThreadResponseDTO> getById(@PathVariable Long id, Principal principal) {
         return threadRepository.findById(id)
                 .map(thread -> {
                     boolean shouldIncrement = false;
                     
                     if (principal == null) {
-                        // Usuario NO logueado - contar por IP (una vez por IP por hilo)
-                        String clientIp = getClientIp(request);
-                        boolean existsByIp = threadViewRepository.existsByThreadAndIpAddress(thread, clientIp);
-                        if (!existsByIp) {
-                            ThreadView threadView = new ThreadView();
-                            threadView.setThread(thread);
-                            threadView.setIpAddress(clientIp);
-                            threadViewRepository.save(threadView);
-                            shouldIncrement = true;
-                        }
+                        // Usuario NO logueado - incrementar vista
+                        // Usamos IP o sesión para no contar重复 vistas
+                        shouldIncrement = true;
                     } else {
                         // Usuario logueado - solo incrementar si no ha visto el hilo
                         User currentUser = userRepository.findByEmail(principal.getName()).orElse(null);
@@ -138,15 +130,6 @@ public class ThreadController {
                     return ResponseEntity.ok(toDTO(thread));
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }
-    
-    // Obtener IP real del cliente (considerando proxies)
-    private String getClientIp(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 
     @PostMapping

@@ -15,9 +15,4 @@ public interface ThreadViewRepository extends JpaRepository<ThreadView, Long> {
     Optional<ThreadView> findByThreadAndUser(Thread thread, User user);
     
     boolean existsByThreadAndUser(Thread thread, User user);
-    
-    // Para usuarios anónimos (por IP)
-    Optional<ThreadView> findByThreadAndIpAddress(Thread thread, String ipAddress);
-    
-    boolean existsByThreadAndIpAddress(Thread thread, String ipAddress);
 }
