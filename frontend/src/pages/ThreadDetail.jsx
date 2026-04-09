@@ -180,7 +180,6 @@ export default function ThreadDetail() {
         datePublished={thread.createdAt}
         replyCount={thread.postCount}
       />
-      <div className="thread-detail">
       <article className="thread-header" aria-labelledby="thread-title">
         <div className="thread-header-main">
           <div className="thread-badges">
