@@ -240,6 +240,6 @@ export default function ThreadList() {
           )}
         </>
       )}
-    </>
+    </div>
   );
 }
