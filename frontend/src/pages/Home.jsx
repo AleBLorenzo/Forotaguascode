@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import SEOHead from '../components/SEOHead';
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -58,7 +59,12 @@ export default function Home() {
   }
 
   return (
-    <div className="home-layout">
+    <>
+      <SEOHead 
+        title="Foro de Programación"
+        description="Comunidad de desarrolladores. Comparte conocimientos, resuelve dudas y conecta con otros programadores."
+      />
+      <className="home-layout">
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
       
@@ -331,6 +337,6 @@ export default function Home() {
           </ul>
         </div>
       </aside>
-    </div>
+    </>
   );
 }

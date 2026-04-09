@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import SEOHead from '../components/SEOHead';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -48,7 +49,13 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-container">
+    <>
+      <SEOHead 
+        title="Crear Cuenta"
+        description="Únete a la comunidad de Forotaguascode. Comparte conocimientos y conecta con otros desarrolladores."
+        noIndex={true}
+      />
+      <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-icon">

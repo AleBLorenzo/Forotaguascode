@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import SEOHead, { ForumPostingSchema } from '../components/SEOHead';
 
 export default function ThreadDetail() {
   const { id } = useParams();
@@ -147,6 +148,7 @@ export default function ThreadDetail() {
   if (!thread) {
     return (
       <div className="error-state" role="alert">
+        <SEOHead title="Hilo no encontrado" noIndex={true} />
         <div className="error-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10"/>
@@ -164,7 +166,21 @@ export default function ThreadDetail() {
   }
 
   return (
-    <div className="thread-detail">
+    <>
+      <SEOHead 
+        title={thread.title}
+        description={thread.firstPostContent?.substring(0, 160) || `Hilo en ${thread.categoryName}. ${thread.postCount} respuestas.`}
+        type="article"
+        articleDate={thread.createdAt}
+        canonicalUrl={`https://foro.taguascode.cloud/thread/${thread.id}`}
+      />
+      <ForumPostingSchema 
+        thread={thread}
+        author={{ username: thread.authorUsername }}
+        datePublished={thread.createdAt}
+        replyCount={thread.postCount}
+      />
+      <div className="thread-detail">
       <article className="thread-header" aria-labelledby="thread-title">
         <div className="thread-header-main">
           <div className="thread-badges">
@@ -394,5 +410,6 @@ export default function ThreadDetail() {
         </div>
       )}
     </div>
+    </>
   );
 }

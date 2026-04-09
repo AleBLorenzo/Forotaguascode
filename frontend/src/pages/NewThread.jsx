@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import SEOHead from '../components/SEOHead';
 
 export default function NewThread() {
   const [title, setTitle] = useState('');
@@ -130,7 +131,13 @@ export default function NewThread() {
   }
 
   return (
-    <div className="new-thread-page">
+    <>
+      <SEOHead 
+        title="Crear Nuevo Hilo"
+        description="Crea un nuevo hilo en Forotaguascode"
+        noIndex={true}
+      />
+      <div className="new-thread-page">
       <div className="new-thread-card">
         <header className="form-header">
           <h1>
@@ -315,5 +322,6 @@ export default function NewThread() {
         </form>
       </div>
     </div>
+    </>
   );
 }

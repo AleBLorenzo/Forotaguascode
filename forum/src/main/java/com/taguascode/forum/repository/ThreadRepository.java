@@ -24,4 +24,7 @@ public interface ThreadRepository  extends JpaRepository<Thread, Long>  {
     Page<Thread> findByLockedFalse(Pageable pageable);
     Page<Thread> findAll(Pageable pageable);
 
+    // Para sitemap - últimos 500 hilos (límite recomendado)
+    List<Thread> findTop500ByOrderByCreatedAtDesc();
+
 }

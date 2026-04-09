@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import SEOHead from '../components/SEOHead';
 
 export default function Profile() {
   const { user, logout } = useAuth();
@@ -117,7 +118,13 @@ export default function Profile() {
   }
 
   return (
-    <div className="profile-page">
+    <>
+      <SEOHead 
+        title={`Perfil de ${userData?.username || 'Usuario'}`}
+        description={`Perfil de usuario en Forotaguascode`}
+        noIndex={true}
+      />
+      <div className="profile-page">
       <div className="profile-card">
         <header className="profile-header">
           <div className="profile-avatar-section">

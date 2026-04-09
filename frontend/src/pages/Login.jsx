@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import SEOHead from '../components/SEOHead';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -30,7 +31,13 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-container">
+    <>
+      <SEOHead 
+        title="Iniciar Sesión"
+        description="Inicia sesión en Forotaguascode para participar en la comunidad."
+        noIndex={true}
+      />
+      <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-icon">
@@ -126,5 +133,6 @@ export default function Login() {
         </p>
       </div>
     </div>
+    </>
   );
 }

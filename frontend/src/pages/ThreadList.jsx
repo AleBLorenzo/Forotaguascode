@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import SEOHead from '../components/SEOHead';
 
 export default function ThreadList() {
   const { categoryId } = useParams();
@@ -48,6 +49,12 @@ export default function ThreadList() {
     return 'Todos los Hilos';
   };
 
+  // Meta tags dinámicos
+  const pageTitle = categoryId ? `Categoría ${getCategoryTitle()}` : 'Todos los Hilos';
+  const pageDescription = categoryId 
+    ? `Explora los hilos de la categoría. ${threads.totalElements || 0} hilos disponibles.`
+    : `Explora todos los hilos del foro. ${threads.totalElements || 0} hilos disponibles.`;
+
   if (loading) {
     return (
       <div className="loading-container" role="status" aria-live="polite">
@@ -58,7 +65,12 @@ export default function ThreadList() {
   }
 
   return (
-    <div className="thread-list-page">
+    <>
+      <SEOHead 
+        title={pageTitle}
+        description={pageDescription}
+      />
+      <div className="thread-list-page">
       <header className="page-header">
         <div className="page-header-content">
           <h1>
@@ -229,6 +241,6 @@ export default function ThreadList() {
           )}
         </>
       )}
-    </div>
+    </>
   );
 }
