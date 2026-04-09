@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import SEOHead, { ForumPostingSchema } from '../components/SEOHead';
 
 export default function ThreadDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [thread, setThread] = useState(null);
   const [posts, setPosts] = useState({ content: [] });
   const [newPost, setNewPost] = useState('');
@@ -120,6 +121,21 @@ export default function ThreadDetail() {
     }
   };
 
+  const handleDeleteThread = async () => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este hilo? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    
+    try {
+      await api.deleteThread(parseInt(id));
+      // Redirigir al listado de hilos
+      navigate('/threads');
+    } catch (error) {
+      console.error('Error deleting thread:', error);
+      alert('Error al eliminar el hilo: ' + error.message);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('es-ES', {
@@ -207,7 +223,11 @@ export default function ThreadDetail() {
           <div className="thread-meta">
             <div className="thread-author">
               <div className="avatar">
-                {thread.authorUsername?.charAt(0).toUpperCase()}
+                {thread.authorAvatarUrl ? (
+                  <img src={thread.authorAvatarUrl} alt={`Avatar de ${thread.authorUsername}`} />
+                ) : (
+                  thread.authorUsername?.charAt(0).toUpperCase()
+                )}
               </div>
               <div className="author-info">
                 <span className="author-name">{thread.authorUsername}</span>
@@ -263,6 +283,21 @@ export default function ThreadDetail() {
                 </>
               )}
             </button>
+            
+            {/* Botón de eliminar hilo - solo para autor o admin */}
+            {(user?.role === 'ADMIN' || user?.role === 'MODERATOR' || (user && thread.authorUsername === user.username)) && (
+              <button 
+                onClick={handleDeleteThread}
+                className="btn btn-danger btn-sm"
+                aria-label="Eliminar hilo"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Eliminar
+              </button>
+            )}
           </div>
 
           {thread.tags && thread.tags.length > 0 && (
@@ -293,7 +328,11 @@ export default function ThreadDetail() {
             >
               <div className="post-author">
                 <div className="avatar" aria-hidden="true">
-                  {post.authorUsername?.charAt(0).toUpperCase()}
+                  {post.authorAvatarUrl ? (
+                    <img src={post.authorAvatarUrl} alt={`Avatar de ${post.authorUsername}`} />
+                  ) : (
+                    post.authorUsername?.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <div className="author-details">
                   <span id={`post-author-${post.id}`} className="username">{post.authorUsername}</span>

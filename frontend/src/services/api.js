@@ -115,6 +115,20 @@ export const api = {
     return res.json();
   },
 
+  async deleteThread(id) {
+    const res = await fetch(`${API_URL}/api/threads/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    
+    if (!res.ok) {
+      const error = await res.text().catch(() => 'Error al eliminar hilo');
+      throw new Error(error || `Error ${res.status}`);
+    }
+    
+    return true;
+  },
+
   async createThread(title, categoryId, content, tagsIds = []) {
     const res = await fetch(`${API_URL}/api/threads`, {
       method: 'POST',

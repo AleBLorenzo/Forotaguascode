@@ -99,21 +99,34 @@ public class ThreadController {
     public ResponseEntity<ThreadResponseDTO> getById(@PathVariable Long id, Principal principal) {
         return threadRepository.findById(id)
                 .map(thread -> {
-                    // Solo incrementar vistas si el usuario no ha visto este hilo antes
-                    if (principal != null) {
+                    boolean shouldIncrement = false;
+                    
+                    if (principal == null) {
+                        // Usuario NO logueado - incrementar vista
+                        // Usamos IP o sesión para no contar重复 vistas
+                        shouldIncrement = true;
+                    } else {
+                        // Usuario logueado - solo incrementar si no ha visto el hilo
                         User currentUser = userRepository.findByEmail(principal.getName()).orElse(null);
-                        if (currentUser != null && !threadViewRepository.existsByThreadAndUser(thread, currentUser)) {
-                            // Registrar la vista
-                            ThreadView threadView = new ThreadView();
-                            threadView.setThread(thread);
-                            threadView.setUser(currentUser);
-                            threadViewRepository.save(threadView);
-                            
-                            // Incrementar contador de vistas
-                            thread.setViews(thread.getViews() + 1);
-                            threadRepository.save(thread);
+                        if (currentUser != null) {
+                            boolean exists = threadViewRepository.existsByThreadAndUser(thread, currentUser);
+                            if (!exists) {
+                                // Registrar la vista del usuario logueado
+                                ThreadView threadView = new ThreadView();
+                                threadView.setThread(thread);
+                                threadView.setUser(currentUser);
+                                threadViewRepository.save(threadView);
+                                shouldIncrement = true;
+                            }
                         }
                     }
+                    
+                    // Incrementar contador de vistas
+                    if (shouldIncrement) {
+                        thread.setViews(thread.getViews() + 1);
+                        threadRepository.save(thread);
+                    }
+                    
                     return ResponseEntity.ok(toDTO(thread));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -181,11 +194,28 @@ public class ThreadController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!threadRepository.existsById(id)) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, Principal principal) {
+        var threadOpt = threadRepository.findById(id);
+        if (threadOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        
+        Thread thread = threadOpt.get();
+        String userEmail = principal.getName();
+        User currentUser = userRepository.findByEmail(userEmail).orElse(null);
+        
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        // Permitir delete si es ADMIN o si es el autor del hilo
+        boolean isAdmin = currentUser.getRole().equals("ADMIN") || currentUser.getRole().equals("MODERATOR");
+        boolean isAuthor = thread.getAuthor().getEmail().equals(userEmail);
+        
+        if (!isAdmin && !isAuthor) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         threadRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -209,6 +239,7 @@ public class ThreadController {
                 thread.getViews(),
                 thread.getCreatedAt(),
                 thread.getAuthor().getUsername(),
+                thread.getAuthor().getAvatarUrl(),
                 thread.getCategory().getName(),
                 tagNames,
                 postCount,

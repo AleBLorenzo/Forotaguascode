@@ -26,8 +26,10 @@ import com.taguascode.forum.dto.post.PostCreateDTO;
 import com.taguascode.forum.dto.post.PostResponseDTO;
 import com.taguascode.forum.dto.post.PostUpdateDTO;
 import com.taguascode.forum.model.Post;
+import com.taguascode.forum.model.PostLike;
 import com.taguascode.forum.model.Thread;
 import com.taguascode.forum.model.User;
+import com.taguascode.forum.repository.PostLikeRepository;
 import com.taguascode.forum.repository.PostRepository;
 import com.taguascode.forum.repository.ThreadRepository;
 import com.taguascode.forum.repository.UserRepository;
@@ -44,6 +46,9 @@ public class PostController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostLikeRepository postLikeRepository;
 
     @GetMapping("/thread/{threadId}")
     public ResponseEntity<Page<PostResponseDTO>> getByThread(
@@ -111,11 +116,39 @@ public class PostController {
     }
 
     @PutMapping("/{id}/like")
-    public ResponseEntity<PostResponseDTO> like(@PathVariable Long id) {
+    public ResponseEntity<PostResponseDTO> like(@PathVariable Long id, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return postRepository.findById(id)
                 .map(post -> {
-                    post.setLikes(post.getLikes() + 1);
-                    return ResponseEntity.ok(toDTO(postRepository.save(post)));
+                    // Obtener el usuario actual
+                    User user = userRepository.findByEmail(principal.getName()).orElse(null);
+                    if (user == null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).<PostResponseDTO>build();
+                    }
+
+                    // Verificar si el usuario ya dio like
+                    boolean alreadyLiked = postLikeRepository.existsByPostAndUser(post, user);
+
+                    if (alreadyLiked) {
+                        // Quitar like
+                        postLikeRepository.deleteByPostAndUser(post, user);
+                    } else {
+                        // Agregar like
+                        PostLike postLike = new PostLike();
+                        postLike.setPost(post);
+                        postLike.setUser(user);
+                        postLikeRepository.save(postLike);
+                    }
+
+                    // Actualizar contador de likes
+                    long likesCount = postLikeRepository.countByPost(post);
+                    post.setLikes((int) likesCount);
+                    postRepository.save(post);
+
+                    return ResponseEntity.ok(toDTO(post));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -136,10 +169,13 @@ public class PostController {
     }
 
     private PostResponseDTO toDTO(Post post) {
+        // Contar likes desde la tabla de likes
+        long likesCount = postLikeRepository.countByPost(post);
+        
         return new PostResponseDTO(
                 post.getId(),
                 post.getContent(),
-                post.getLikes(),
+                (int) likesCount,
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 post.getAuthor().getUsername(),

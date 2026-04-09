@@ -506,6 +506,35 @@ img {
   object-fit: cover;
 }
 
+/* Avatar pequeño para listas de hilos */
+.avatar-small {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 10px;
+  overflow: hidden;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Autor con avatar en lista de hilos */
+.thread-author-with-avatar {
+  display: inline-flex;
+  align-items: center;
+}
+
 .username {
   font-weight: 500;
   font-size: var(--font-size-sm);
@@ -1018,7 +1047,7 @@ img {
 }
 
 .meta-separator {
-  color: var(--gray-300);
+  color: var(--gray-400);
 }
 
 .thread-category-badge {
@@ -1033,11 +1062,31 @@ img {
   align-items: center;
   gap: 6px;
   transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 
-.thread-category-badge:hover {
+/* Mejor contraste para modo oscuro */
+[data-theme="dark"] .thread-category-badge {
   background: var(--secondary);
-  color: white;
+  color: var(--white);
+  border-color: var(--secondary-light);
+}
+
+[data-theme="dark"] .thread-category-badge:hover {
+  background: var(--secondary-light);
+  color: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .thread-category-badge {
+    background: var(--secondary);
+    color: var(--white);
+    border-color: var(--secondary-light);
+  }
+  .thread-category-badge:hover {
+    background: var(--secondary-light);
+    color: var(--white);
+  }
 }
 
 /* Badges */
@@ -1697,6 +1746,11 @@ img {
   color: var(--gray-900);
   background: var(--white);
   transition: all var(--transition-fast);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--gray-500);
 }
 
 .form-group input:focus, 

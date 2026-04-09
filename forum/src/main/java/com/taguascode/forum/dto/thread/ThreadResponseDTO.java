@@ -20,6 +20,7 @@ public class ThreadResponseDTO {
     private int views;
     private LocalDateTime createdAt;
     private String authorUsername;
+    private String authorAvatarUrl;  // Avatar del autor
     private String categoryName;
     private List<String> tags;
     private long postCount;

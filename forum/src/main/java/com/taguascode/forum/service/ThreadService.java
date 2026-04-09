@@ -126,6 +126,7 @@ public class ThreadService {
                 thread.getViews(),
                 thread.getCreatedAt(),
                 thread.getAuthor().getUsername(),
+                thread.getAuthor().getAvatarUrl(),
                 thread.getCategory().getName(),
                 tagNames,
                 postCount,
